@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIEM-lite // Live Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg:        #080b10;
+  --bg2:       #0d1117;
+  --surface:   #111620;
+  --surface2:  #161d2c;
+  --border:    #1e2a3a;
+  --border2:   #243044;
+  --accent:    #00d4ff;
+  --accent2:   #0077ff;
+  --green:     #00ff88;
+  --red:       #ff3355;
+  --orange:    #ff8c00;
+  --yellow:    #ffd700;
+  --purple:    #b060ff;
+  --text:      #c8d8e8;
+  --muted:     #4a6070;
+  --mono:      'Share Tech Mono', monospace;
+  --sans:      'Barlow', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Topbar ── */
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+#topbar .logo {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+#topbar .logo .slash { color: var(--muted); }
+.topbar-right { display: flex; align-items: center; gap: 1.5rem; }
+
+#conn-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+#conn-dot.connected { background: var(--green); box-shadow: 0 0 8px var(--green); }
+#conn-dot.scanning  { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 0.8s infinite; }
+#conn-dot.error     { background: var(--red);    box-shadow: 0 0 8px var(--red); }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+#conn-label, #last-scan-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#btn-scan {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+#btn-scan:hover    { background: var(--accent); color: var(--bg); }
+#btn-scan:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Layout ── */
+#main { padding: 1.5rem 2rem; max-width: 1600px; margin: 0 auto; }
+
+/* ── Stat cards ── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.1rem 1.3rem;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--card-accent, var(--accent));
+}
+.stat-card .s-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.stat-card .s-value {
+  font-family: var(--mono);
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--card-accent, var(--accent));
+  transition: color 0.3s;
+}
+.stat-card .s-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.2rem; }
+
+/* ── Grids ── */
+.grid { display: grid; gap: 1rem; }
+.grid-3-2 { grid-template-columns: 3fr 2fr; }
+.grid-2   { grid-template-columns: 1fr 1fr; }
+.mb { margin-bottom: 1rem; }
+
+/* ── Panels ── */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1.1rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.panel-head .ph-title {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.panel-head .ph-count { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
+.panel-head.ph-threat .ph-title { color: var(--purple); }
+
+/* ── Tables ── */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 0.5rem 1.1rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+th {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(0,212,255,0.03); }
+td.mono  { font-family: var(--mono); }
+td.right { text-align: right; }
+
+/* ── Badges ── */
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.badge-critical    { background:rgba(255,51,85,0.15);   color:var(--red);    border:1px solid rgba(255,51,85,0.3); }
+.badge-high        { background:rgba(255,140,0,0.15);   color:var(--orange); border:1px solid rgba(255,140,0,0.3); }
+.badge-medium      { background:rgba(255,215,0,0.12);   color:var(--yellow); border:1px solid rgba(255,215,0,0.3); }
+.badge-low         { background:rgba(0,212,255,0.1);    color:var(--accent); border:1px solid rgba(0,212,255,0.2); }
+.badge-info        { background:rgba(0,212,255,0.08);   color:var(--muted);  border:1px solid var(--border2); }
+.badge-error       { background:rgba(255,140,0,0.15);   color:var(--orange); border:1px solid rgba(255,140,0,0.3); }
+.badge-warning     { background:rgba(255,215,0,0.12);   color:var(--yellow); border:1px solid rgba(255,215,0,0.3); }
+.badge-information { background:rgba(0,212,255,0.08);   color:var(--muted);  border:1px solid var(--border2); }
+.badge-threat      { background:rgba(176,96,255,0.15);  color:var(--purple); border:1px solid rgba(176,96,255,0.3); }
+
+/* ── New row flash ── */
+tbody tr.new-row { animation: rowFlash 1.8s ease-out; }
+@keyframes rowFlash { 0% { background:rgba(0,212,255,0.1); } 100% { background:transparent; } }
+tbody tr.new-row-threat { animation: rowFlashThreat 1.8s ease-out; }
+@keyframes rowFlashThreat { 0% { background:rgba(176,96,255,0.12); } 100% { background:transparent; } }
+
+/* ── Incident expand ── */
+.incident-row { cursor: pointer; }
+.incident-row:hover td { background: rgba(176,96,255,0.05) !important; }
+.incident-detail {
+  display: none;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+}
+.incident-detail.open { display: table-row; }
+.incident-detail td {
+  padding: 0.8rem 1.1rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.linked-event {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  margin: 0.1rem 0.2rem 0.1rem 0;
+  color: var(--accent);
+}
+.mitre-tag {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--purple);
+  background: rgba(176,96,255,0.08);
+  border: 1px solid rgba(176,96,255,0.2);
+  border-radius: 2px;
+  padding: 0.1rem 0.45rem;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Severity bars ── */
+.sev-bars { padding: 1rem 1.1rem; }
+.sev-row  { display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; }
+.sev-label { font-family:var(--mono); font-size:0.68rem; width:90px; flex-shrink:0; }
+.sev-bar-wrap { flex:1; height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+.sev-bar { height:100%; border-radius:3px; transition:width 0.6s ease; }
+.sev-count { font-family:var(--mono); font-size:0.68rem; color:var(--muted); width:40px; text-align:right; flex-shrink:0; }
+
+/* ── Event feed ── */
+#event-feed {
+  height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.feed-item {
+  display: grid;
+  grid-template-columns: 75px 80px 80px 1fr;
+  gap: 0.5rem;
+  padding: 0.35rem 1.1rem;
+  border-bottom: 1px solid rgba(30,42,58,0.5);
+  font-size: 0.75rem;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+.feed-item:hover { background: rgba(0,212,255,0.03); }
+@keyframes fadeIn { from { opacity:0; transform:translateX(-6px); } to { opacity:1; transform:none; } }
+.feed-time { font-family:var(--mono); color:var(--muted); font-size:0.65rem; }
+.feed-ch   { font-family:var(--mono); font-size:0.65rem; color:var(--accent2); }
+.feed-msg  { color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.desc-cell   { max-width:300px; font-size:0.78rem; }
+.preview-text { color:var(--muted); font-size:0.68rem; display:block; margin-top:0.15rem; font-family:var(--mono); }
+
+/* ── Alert banner ── */
+#alert-banner {
+  display: none;
+  background: rgba(255,51,85,0.08);
+  border: 1px solid rgba(255,51,85,0.3);
+  border-radius: 4px;
+  padding: 0.7rem 1.2rem;
+  margin-bottom: 1rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--red);
+  animation: alertPulse 2s infinite;
+}
+@keyframes alertPulse { 0%,100% { border-color:rgba(255,51,85,0.3); } 50% { border-color:rgba(255,51,85,0.6); } }
+
+#scan-flash {
+  position: fixed; inset: 0;
+  background: rgba(0,212,255,0.025);
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.2s; z-index: 9998;
+}
+#scan-flash.active { opacity: 1; }
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1200px) {
+  .stat-row   { grid-template-columns: repeat(3, 1fr); }
+  .grid-3-2   { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .stat-row { grid-template-columns: 1fr 1fr; }
+  .grid-2   { grid-template-columns: 1fr; }
+  #topbar   { padding: 0 1rem; }
+  #main     { padding: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="scan-flash"></div>
+
+<div id="topbar">
+  <div class="logo">
+    <span>SIEM</span><span class="slash">//</span><span>LITE</span>
+  </div>
+  <div class="topbar-right">
+    <span id="last-scan-label">No scan yet</span>
+    <button id="btn-scan" onclick="requestScan()">⟳ Scan Now</button>
+    <span id="conn-label">Connecting</span>
+    <div id="conn-dot"></div>
+  </div>
+</div>
+
+<div id="main">
+
+  <div id="alert-banner"></div>
+
+  <!-- Stat Cards — now 6 including Incidents -->
+  <div class="stat-row">
+    <div class="stat-card" style="--card-accent:var(--accent)">
+      <div class="s-label">Total Events</div>
+      <div class="s-value" id="stat-total">—</div>
+      <div class="s-sub">in scan window</div>
+    </div>
+    <div class="stat-card" style="--card-accent:var(--purple)">
+      <div class="s-label">Incidents</div>
+      <div class="s-value" id="stat-incidents">—</div>
+      <div class="s-sub">correlated threats</div>
+    </div>
+    <div class="stat-card" style="--card-accent:var(--red)">
+      <div class="s-label">Anomalies</div>
+      <div class="s-value" id="stat-anomalies">—</div>
+      <div class="s-sub">raw detections</div>
+    </div>
+    <div class="stat-card" style="--card-accent:var(--red)">
+      <div class="s-label">Errors / Criticals</div>
+      <div class="s-value" id="stat-errors">—</div>
+      <div class="s-sub">high severity</div>
+    </div>
+    <div class="stat-card" style="--card-accent:var(--yellow)">
+      <div class="s-label">Warnings</div>
+      <div class="s-value" id="stat-warnings">—</div>
+      <div class="s-sub">flagged</div>
+    </div>
+    <div class="stat-card" style="--card-accent:var(--green)">
+      <div class="s-label">Channels</div>
+      <div class="s-value" id="stat-channels">—</div>
+      <div class="s-sub">monitored</div>
+    </div>
+  </div>
+
+  <!-- Row 1: Threat Incidents (full width) -->
+  <div class="panel mb">
+    <div class="panel-head ph-threat">
+      <span class="ph-title">◈ Threat Incidents</span>
+      <span class="ph-count" id="incident-count-label">0 correlated</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="incident-table">
+        <thead>
+          <tr>
+            <th>Severity</th>
+            <th>Rule</th>
+            <th>Title</th>
+            <th>MITRE</th>
+            <th>Detected</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody id="incident-tbody">
+          <tr><td colspan="6" class="empty-state">Waiting for scan data…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Row 2: Anomaly table + Severity bars -->
+  <div class="grid grid-3-2 mb">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="ph-title">⚠ Anomaly Detection</span>
+        <span class="ph-count" id="anomaly-count-label">0 found</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="anomaly-table">
+          <thead>
+            <tr>
+              <th>Severity</th>
+              <th>Type</th>
+              <th>Channel</th>
+              <th>Event ID</th>
+              <th>Time</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody id="anomaly-tbody">
+            <tr><td colspan="6" class="empty-state">Waiting for scan data…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="ph-title">Severity Breakdown</span></div>
+      <div class="sev-bars" id="sev-bars"><div class="empty-state">Waiting…</div></div>
+    </div>
+  </div>
+
+  <!-- Row 3: Event feed + Top Providers + Top Event IDs -->
+  <div class="grid grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="ph-title">Recent Events</span>
+        <span class="ph-count" id="feed-count-label"></span>
+      </div>
+      <div id="event-feed"><div class="empty-state">Waiting…</div></div>
+    </div>
+    <div class="grid" style="gap:1rem;">
+      <div class="panel">
+        <div class="panel-head"><span class="ph-title">Top Providers</span></div>
+        <table>
+          <thead><tr><th>Provider</th><th class="right">Count</th></tr></thead>
+          <tbody id="provider-tbody"><tr><td colspan="2" class="empty-state">Waiting…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="ph-title">Top Event IDs</span></div>
+        <table>
+          <thead><tr><th>Event ID</th><th class="right">Count</th></tr></thead>
+          <tbody id="eventid-tbody"><tr><td colspan="2" class="empty-state">Waiting…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+const socket      = io();
+const dot         = document.getElementById('conn-dot');
+const connLabel   = document.getElementById('conn-label');
+const btnScan     = document.getElementById('btn-scan');
+const lastScanEl  = document.getElementById('last-scan-label');
+const flashEl     = document.getElementById('scan-flash');
+
+let prevAnomalyCount  = 0;
+let prevIncidentCount = 0;
+
+// ── Connection ────────────────────────────────────────────────
+socket.on('connect',    () => { dot.className = 'connected'; connLabel.textContent = 'Live'; });
+socket.on('disconnect', () => { dot.className = '';          connLabel.textContent = 'Disconnected'; });
+
+socket.on('scan_started', () => {
+  dot.className = 'scanning';
+  connLabel.textContent = 'Scanning…';
+  btnScan.disabled = true;
+  flashEl.classList.add('active');
+  setTimeout(() => flashEl.classList.remove('active'), 400);
+});
+
+socket.on('scan_complete', (data) => {
+  dot.className = 'connected';
+  connLabel.textContent = 'Live';
+  btnScan.disabled = false;
+
+  if (data.scan_time && data.scan_time !== 'No scan yet')
+    lastScanEl.textContent = 'Last scan: ' + data.scan_time;
+
+  if (data.summary && Object.keys(data.summary).length) {
+    updateStats(data.summary, data.anomalies || [], data.incidents || []);
+    updateSeverityBars(data.summary.severity_breakdown || {}, data.summary.total_events || 0);
+    updateProviders(data.summary.top_providers || {});
+    updateEventIDs(data.summary.top_event_ids || []);
+    updateEventFeed(data.summary);
+  }
+  if (data.anomalies !== undefined) updateAnomalies(data.anomalies);
+  if (data.incidents !== undefined) updateIncidents(data.incidents);
+  checkAlerts(data.anomalies || [], data.incidents || []);
+});
+
+socket.on('scan_error', (data) => {
+  dot.className = 'error';
+  connLabel.textContent = 'Error';
+  btnScan.disabled = false;
+  showAlert('⚠ Scan error: ' + data.error);
+});
+
+function requestScan() { socket.emit('request_scan'); }
+
+// ── Stat cards ────────────────────────────────────────────────
+function updateStats(summary, anomalies, incidents) {
+  const sev = summary.severity_breakdown || {};
+  animateValue('stat-total',     summary.total_events || 0);
+  animateValue('stat-incidents', incidents.length);
+  animateValue('stat-anomalies', anomalies.length);
+  animateValue('stat-errors',    (sev.Error || 0) + (sev.Critical || 0));
+  animateValue('stat-warnings',  sev.Warning || 0);
+  animateValue('stat-channels',  Object.keys(summary.channel_breakdown || {}).length);
+}
+
+function animateValue(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = parseInt(el.textContent) || 0;
+  const diff  = target - start;
+  if (!diff) return;
+  const t0 = performance.now();
+  (function step(now) {
+    const p = Math.min((now - t0) / 400, 1);
+    el.textContent = Math.round(start + diff * (1 - Math.pow(1 - p, 3))).toLocaleString();
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+// ── Severity bars ─────────────────────────────────────────────
+const SEV_COLORS = {
+  Critical: 'var(--red)', Error: 'var(--orange)',
+  Warning:  'var(--yellow)', Information: 'var(--accent)', Verbose: 'var(--muted)',
+};
+function updateSeverityBars(breakdown, total) {
+  const el  = document.getElementById('sev-bars');
+  const ord = ['Critical','Error','Warning','Information','Verbose'];
+  let html  = '';
+  for (const sev of ord) {
+    const count = breakdown[sev] || 0;
+    if (!count) continue;
+    const pct   = total ? Math.max(2, Math.round(count / total * 100)) : 0;
+    const color = SEV_COLORS[sev] || 'var(--muted)';
+    html += `<div class="sev-row">
+      <span class="sev-label" style="color:${color}">${sev}</span>
+      <div class="sev-bar-wrap"><div class="sev-bar" style="width:${pct}%;background:${color}"></div></div>
+      <span class="sev-count">${count.toLocaleString()}</span>
+    </div>`;
+  }
+  el.innerHTML = html || '<div class="empty-state">No data</div>';
+}
+
+// ── Incidents table ───────────────────────────────────────────
+function updateIncidents(incidents) {
+  const tbody = document.getElementById('incident-tbody');
+  const label = document.getElementById('incident-count-label');
+  label.textContent = incidents.length + ' correlated';
+
+  if (!incidents.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:var(--green)">✓ No correlated threats detected</td></tr>';
+    prevIncidentCount = 0;
+    return;
+  }
+
+  const isNew = incidents.length > prevIncidentCount;
+  prevIncidentCount = incidents.length;
+
+  let html = '';
+  incidents.forEach((inc, i) => {
+    const rowId = `inc-detail-${i}`;
+    const linkedHtml = (inc.linked_events || []).slice(0, 5).map(e =>
+      `<span class="linked-event">ID ${e.EventId || e.event_id || '?'} · ${(e.Channel || e.channel || '?')}</span>`
+    ).join('');
+
+    html += `
+      <tr class="incident-row ${isNew && i === 0 ? 'new-row-threat' : ''}"
+          onclick="toggleIncident('${rowId}')">
+        <td>${severityBadge(inc.severity)}</td>
+        <td><span class="badge badge-threat">${inc.rule_id}</span></td>
+        <td style="font-weight:600">${inc.title}</td>
+        <td><span class="mitre-tag">${inc.mitre}</span></td>
+        <td class="mono" style="font-size:0.68rem;color:var(--muted)">${inc.detected_at}</td>
+        <td class="desc-cell">${inc.description}</td>
+      </tr>
+      <tr id="${rowId}" class="incident-detail">
+        <td colspan="6">
+          <div style="margin-bottom:0.4rem">
+            <span class="mitre-tag">${inc.mitre}</span>
+          </div>
+          <div style="font-size:0.75rem;margin-bottom:0.5rem;color:var(--text)">${inc.description}</div>
+          ${linkedHtml ? `<div style="margin-top:0.4rem"><span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-right:0.5rem">LINKED EVENTS:</span>${linkedHtml}</div>` : ''}
+        </td>
+      </tr>`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function toggleIncident(rowId) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  row.classList.toggle('open');
+}
+
+// ── Anomalies table ───────────────────────────────────────────
+function severityBadge(sev) {
+  return `<span class="badge badge-${(sev||'').toLowerCase()}">${sev||'—'}</span>`;
+}
+
+function updateAnomalies(anomalies) {
+  const tbody = document.getElementById('anomaly-tbody');
+  const label = document.getElementById('anomaly-count-label');
+  const ord   = ['Critical','High','Medium','Low'];
+  const sorted = [...anomalies].sort((a,b) =>
+    (ord.indexOf(a.severity)+99) - (ord.indexOf(b.severity)+99));
+
+  label.textContent = anomalies.length + ' found';
+
+  if (!anomalies.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:var(--green)">✓ No anomalies detected</td></tr>';
+    prevAnomalyCount = 0;
+    return;
+  }
+
+  const isNew = anomalies.length > prevAnomalyCount;
+  prevAnomalyCount = anomalies.length;
+
+  tbody.innerHTML = sorted.map((a, i) => {
+    const preview = (a.message_preview || '').substring(0,100)
+      .replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<tr class="${isNew && i===0 ? 'new-row' : ''}">
+      <td>${severityBadge(a.severity)}</td>
+      <td class="mono" style="font-size:0.72rem">${a.type||'—'}</td>
+      <td class="mono" style="font-size:0.72rem">${a.channel||'—'}</td>
+      <td class="mono">${a.event_id||'—'}</td>
+      <td class="mono" style="font-size:0.68rem;color:var(--muted)">${(a.time||'—').replace('T',' ').substring(0,19)}</td>
+      <td class="desc-cell">${a.description||''}${preview?`<span class="preview-text">${preview}</span>`:''}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Event feed ────────────────────────────────────────────────
+function updateEventFeed(summary) {
+  const feed  = document.getElementById('event-feed');
+  const label = document.getElementById('feed-count-label');
+  const total = summary.total_events || 0;
+  label.textContent = total.toLocaleString() + ' total';
+
+  const providers = Object.entries(summary.top_providers || {}).slice(0, 12);
+  const channels  = Object.keys(summary.channel_breakdown || {});
+  const now       = new Date();
+
+  if (!providers.length) { feed.innerHTML = '<div class="empty-state">No events</div>'; return; }
+
+  feed.innerHTML = providers.map(([prov, count], i) => {
+    const ch = channels[i % channels.length] || 'System';
+    const ts = new Date(now - i * 47000).toTimeString().substring(0, 8);
+    return `<div class="feed-item">
+      <span class="feed-time">${ts}</span>
+      <span class="feed-ch">${ch}</span>
+      <span class="badge badge-info">${count}</span>
+      <span class="feed-msg">${prov.replace('Microsoft-Windows-','MW-')}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Providers + Event IDs ─────────────────────────────────────
+function updateProviders(providers) {
+  const tbody = document.getElementById('provider-tbody');
+  const items = Object.entries(providers).slice(0, 8);
+  tbody.innerHTML = items.length
+    ? items.map(([p, c]) => `<tr>
+        <td class="mono" style="font-size:0.72rem" title="${p}">${p.replace('Microsoft-Windows-','MW-')}</td>
+        <td class="mono right">${c.toLocaleString()}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="2" class="empty-state">No data</td></tr>';
+}
+
+function updateEventIDs(ids) {
+  const tbody = document.getElementById('eventid-tbody');
+  tbody.innerHTML = ids.slice(0,8).length
+    ? ids.slice(0,8).map(item => `<tr>
+        <td class="mono">${item.event_id}</td>
+        <td class="mono right">${item.count.toLocaleString()}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="2" class="empty-state">No data</td></tr>';
+}
+
+// ── Alert banner ──────────────────────────────────────────────
+function checkAlerts(anomalies, incidents) {
+  const banner    = document.getElementById('alert-banner');
+  const critInc   = incidents.filter(i => i.severity === 'Critical');
+  const critAnoms = anomalies.filter(a => a.severity === 'Critical');
+
+  if (critInc.length) {
+    showAlert(`🔴 ${critInc.length} CRITICAL incident${critInc.length>1?'s':''}: ${critInc.map(i=>i.title).join(' · ')}`);
+  } else if (critAnoms.length) {
+    showAlert(`🟠 ${critAnoms.length} critical anomaly${critAnoms.length>1?'ies':''} detected`);
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function showAlert(msg) {
+  const b = document.getElementById('alert-banner');
+  b.textContent  = msg;
+  b.style.display = 'block';
+}
+</script>
+</body>
+</html>

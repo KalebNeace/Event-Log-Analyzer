@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log Analyzer Report — 2026-03-30 22:29:39</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3250;
+    --accent: #4a9eff;
+    --text: #e2e8f0;
+    --muted: #8892a4;
+    --green: #2ecc71;
+    --red: #ff4444;
+    --orange: #ff8c00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  header {
+    border-left: 4px solid var(--accent);
+    padding-left: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  header p { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+  }
+  .stat-card .label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .stat-card .value { font-size: 2rem; font-weight: bold; margin-top: 0.3rem; }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .panel-header {
+    background: var(--surface2);
+    padding: 0.75rem 1.2rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 0.6rem 1.2rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: var(--surface2); color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(74,158,255,0.05); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+  }
+
+  .anomaly-section { margin-bottom: 2.5rem; }
+  .anomaly-section .panel-header { color: #ff4444; }
+  td.desc { font-size: 0.82rem; max-width: 320px; }
+  small.preview { color: var(--muted); display: block; margin-top: 0.2rem; }
+  td.no-anomalies { text-align: center; color: var(--green); padding: 2rem; }
+
+  footer { color: var(--muted); font-size: 0.75rem; text-align: center; margin-top: 3rem; }
+
+  .pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.55rem 1.2rem;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: opacity 0.15s;
+  }
+  .pdf-btn:hover { opacity: 0.85; }
+
+  @media print {
+    .pdf-btn { display: none; }
+    body { background: #fff; color: #000; padding: 1rem; }
+    .panel, .stat-card { border: 1px solid #ccc; background: #fff; }
+    .panel-header { background: #f0f0f0; color: #333; }
+    th { background: #f0f0f0; color: #333; }
+    header h1 { color: #1a1a1a; }
+    .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .stat-card .value { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    tr:hover td { background: none; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    footer { margin-top: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <h1>&#9632; Log Analyzer Report</h1>
+      <p>Generated: 2026-03-30 22:29:39 &nbsp;|&nbsp; Output: C:\Users\Owner\Desktop\Projects\Log Analyzer\output\2026-03-30_22-29-38</p>
+    </div>
+    <button class="pdf-btn" onclick="exportPDF()">&#128438; Export PDF</button>
+  </div>
+</header>
+
+<script>
+  function exportPDF() {
+    const btn = document.querySelector('.pdf-btn');
+    btn.textContent = 'Preparing...';
+    setTimeout(() => {
+      window.print();
+      btn.innerHTML = '&#128438; Export PDF';
+    }, 100);
+  }
+</script>
+
+<!-- Stat Cards -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="label">Total Events</div>
+    <div class="value" style="color:var(--accent)">434</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Anomalies</div>
+    <div class="value" style="color:#ff4444">37</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Errors / Criticals</div>
+    <div class="value" style="color:var(--red)">23</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Warnings</div>
+    <div class="value" style="color:var(--orange)">67</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Channels Scanned</div>
+    <div class="value" style="color:var(--green)">2</div>
+  </div>
+</div>
+
+<!-- 2-col tables -->
+<div class="grid-2">
+  <div class="panel">
+    <div class="panel-header">Severity Breakdown</div>
+    <table>
+      <thead><tr><th>Level</th><th>Count</th><th>%</th></tr></thead>
+      <tbody>
+            <tr>
+                <td><span class="badge" style="background:#ff8c00;color:#fff">Error</span></td>
+                <td class="num">23</td>
+                <td class="num">5.3%</td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Warning</span></td>
+                <td class="num">67</td>
+                <td class="num">15.4%</td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#4a9eff;color:#fff">Information</span></td>
+                <td class="num">344</td>
+                <td class="num">79.3%</td>
+            </tr></tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <div class="panel-header">Events by Channel</div>
+    <table>
+      <thead><tr><th>Channel</th><th>Count</th></tr></thead>
+      <tbody>
+            <tr><td>System</td><td class="num">255</td></tr>
+            <tr><td>Application</td><td class="num">179</td></tr></tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <div class="panel-header">Top Providers</div>
+    <table>
+      <thead><tr><th>Provider</th><th>Count</th></tr></thead>
+      <tbody>
+            <tr><td title="Microsoft-Windows-DistributedCOM">MW-DistributedCOM</td><td class="num">48</td></tr>
+            <tr><td title="Service Control Manager">Service Control Manager</td><td class="num">42</td></tr>
+            <tr><td title="DSAService">DSAService</td><td class="num">28</td></tr>
+            <tr><td title="Microsoft-Windows-TPM-WMI">MW-TPM-WMI</td><td class="num">18</td></tr>
+            <tr><td title="Chrome">Chrome</td><td class="num">16</td></tr>
+            <tr><td title="SecurityCenter">SecurityCenter</td><td class="num">16</td></tr>
+            <tr><td title="Netwtw14">Netwtw14</td><td class="num">15</td></tr>
+            <tr><td title="Microsoft-Windows-Dhcp-Client">MW-Dhcp-Client</td><td class="num">14</td></tr></tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <div class="panel-header">Top Event IDs</div>
+    <table>
+      <thead><tr><th>Event ID</th><th>Count</th></tr></thead>
+      <tbody>
+            <tr><td>0</td><td class="num">51</td></tr>
+            <tr><td>10016</td><td class="num">48</td></tr>
+            <tr><td>1</td><td class="num">25</td></tr>
+            <tr><td>7045</td><td class="num">22</td></tr>
+            <tr><td>1003</td><td class="num">20</td></tr>
+            <tr><td>256</td><td class="num">16</td></tr>
+            <tr><td>1796</td><td class="num">15</td></tr>
+            <tr><td>7040</td><td class="num">14</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Anomalies -->
+<div class="anomaly-section">
+  <div class="panel">
+    <div class="panel-header">&#9888; Anomaly Detection Results (37 found)</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Severity</th>
+          <th>Type</th>
+          <th>Channel</th>
+          <th>Event ID</th>
+          <th>Time</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+            <tr>
+                <td><span class="badge" style="background:#ff8c00;color:#fff">High</span></td>
+                <td>Repeated Failures</td>
+                <td>System</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="desc">18 errors/criticals from 'Microsoft-Windows-TPM-WMI' in 'System'</td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 22:08:44</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 22:06:12</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 21:43:34</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  Claude Service File Name:  'C:\Program Files\WindowsApps\Claude_1</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 21:36:16</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 21:35:58</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 21:34:29</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_CC_COMM Service File Name:  C:\Program Files (x86)\MSI\On</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 21:34:28</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 21:34:05</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 21:33:51</td>
+                <td class="desc">Service state change<br><small class='preview'>The \Device\NDMP1 service entered the Intel(R) Wi-Fi 6E AX210 160MHz #2 state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 21:33:49</td>
+                <td class="desc">Service state change<br><small class='preview'>The  service entered the Driver load complete state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 21:33:49</td>
+                <td class="desc">Service state change<br><small class='preview'>The  service entered the Driver load start state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 16:22:08</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 15:54:46</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 15:53:08</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 15:22:56</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 14:21:31</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 14:21:30</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_CC_COMM Service File Name:  C:\Program Files (x86)\MSI\On</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 14:21:13</td>
+                <td class="desc">Service state change<br><small class='preview'>The \Device\NDMP1 service entered the Intel(R) Wi-Fi 6E AX210 160MHz #2 state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 14:21:11</td>
+                <td class="desc">Service state change<br><small class='preview'>The  service entered the Driver load complete state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 14:21:11</td>
+                <td class="desc">Service state change<br><small class='preview'>The  service entered the Driver load start state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 09:34:55</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 09:24:27</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 08:56:09</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  Claude Service File Name:  'C:\Program Files\WindowsApps\Claude_1</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 08:52:35</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 08:52:20</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 08:52:02</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 08:50:55</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\Program Files (x86)\MS</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7045</td>
+                <td>2026-03-30 08:50:54</td>
+                <td class="desc">New service installed<br><small class='preview'>A service was installed in the system.  Service Name:  NTIOLib_CC_COMM Service File Name:  C:\Program Files (x86)\MSI\On</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 08:50:43</td>
+                <td class="desc">Service state change<br><small class='preview'>The  service entered the Filter detach complete state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 08:50:43</td>
+                <td class="desc">Service state change<br><small class='preview'>The  service entered the Filter detach start state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 08:50:43</td>
+                <td class="desc">Service state change<br><small class='preview'>The  service entered the Filter pause complete state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>System</td>
+                <td>7036</td>
+                <td>2026-03-30 08:50:43</td>
+                <td class="desc">Service state change<br><small class='preview'>The  service entered the Filter pause start state.</small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>Application</td>
+                <td>4625</td>
+                <td>2026-03-30 21:33:55</td>
+                <td class="desc">Failed logon attempt<br><small class='preview'>The EventSystem sub system is suppressing duplicate event log entries for a duration of 86400 seconds.  The suppression </small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>Application</td>
+                <td>4625</td>
+                <td>2026-03-30 14:21:17</td>
+                <td class="desc">Failed logon attempt<br><small class='preview'>The EventSystem sub system is suppressing duplicate event log entries for a duration of 86400 seconds.  The suppression </small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>Application</td>
+                <td>4625</td>
+                <td>2026-03-30 08:50:43</td>
+                <td class="desc">Failed logon attempt<br><small class='preview'>The EventSystem sub system is suppressing duplicate event log entries for a duration of 86400 seconds.  The suppression </small></td>
+            </tr>
+            <tr>
+                <td><span class="badge" style="background:#f0c040;color:#333">Medium</span></td>
+                <td>Flagged Event ID</td>
+                <td>Application</td>
+                <td>4625</td>
+                <td>2026-03-30 00:21:53</td>
+                <td class="desc">Failed logon attempt<br><small class='preview'>The EventSystem sub system is suppressing duplicate event log entries for a duration of 86400 seconds.  The suppression </small></td>
+            </tr></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>Windows Log Analyzer &mdash; Kaleb Neace &mdash; 2026-03-30 22:29:39</footer>
+</body>
+</html>

@@ -1,0 +1,441 @@
+{
+  "summary": {
+    "total_events": 434,
+    "generated_at": "2026-03-30 22:29:39",
+    "severity_breakdown": {
+      "Information": 344,
+      "Warning": 67,
+      "Error": 23
+    },
+    "channel_breakdown": {
+      "System": 255,
+      "Application": 179
+    },
+    "top_providers": {
+      "Microsoft-Windows-DistributedCOM": 48,
+      "Service Control Manager": 42,
+      "DSAService": 28,
+      "Microsoft-Windows-TPM-WMI": 18,
+      "Chrome": 16,
+      "SecurityCenter": 16,
+      "Netwtw14": 15,
+      "Microsoft-Windows-Dhcp-Client": 14,
+      "Microsoft-Windows-Wininit": 14,
+      "Service1": 14
+    },
+    "top_event_ids": [
+      {
+        "event_id": 0,
+        "count": 51
+      },
+      {
+        "event_id": 10016,
+        "count": 48
+      },
+      {
+        "event_id": 1,
+        "count": 25
+      },
+      {
+        "event_id": 7045,
+        "count": 22
+      },
+      {
+        "event_id": 1003,
+        "count": 20
+      },
+      {
+        "event_id": 256,
+        "count": 16
+      },
+      {
+        "event_id": 1796,
+        "count": 15
+      },
+      {
+        "event_id": 7040,
+        "count": 14
+      },
+      {
+        "event_id": 15,
+        "count": 12
+      },
+      {
+        "event_id": 7036,
+        "count": 10
+      }
+    ]
+  },
+  "anomalies": [
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 22:08:44",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 22:06:12",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 21:43:34",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  Claude Service File Name:  'C:\\Program Files\\WindowsApps\\Claude_1.1.9669.0_x64__pzs8sxrjxfjjc\\app\\resources\\cowork-svc.exe' Service Type:  user m"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 21:36:16",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 21:35:58",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 21:34:29",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_CC_COMM Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Lib\\SYS\\NTIOLib_X64.sys Service Type:  kernel mode driver Servic"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 21:34:28",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 21:34:05",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 21:33:51",
+      "provider": "Netwtw14",
+      "description": "Service state change",
+      "message_preview": "The \\Device\\NDMP1 service entered the Intel(R) Wi-Fi 6E AX210 160MHz #2 state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 21:33:49",
+      "provider": "VfpExt",
+      "description": "Service state change",
+      "message_preview": "The  service entered the Driver load complete state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 21:33:49",
+      "provider": "VfpExt",
+      "description": "Service state change",
+      "message_preview": "The  service entered the Driver load start state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 16:22:08",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 15:54:46",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 15:53:08",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 15:22:56",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 14:21:31",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 14:21:30",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_CC_COMM Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Lib\\SYS\\NTIOLib_X64.sys Service Type:  kernel mode driver Servic"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 14:21:13",
+      "provider": "Netwtw14",
+      "description": "Service state change",
+      "message_preview": "The \\Device\\NDMP1 service entered the Intel(R) Wi-Fi 6E AX210 160MHz #2 state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 14:21:11",
+      "provider": "VfpExt",
+      "description": "Service state change",
+      "message_preview": "The  service entered the Driver load complete state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 14:21:11",
+      "provider": "VfpExt",
+      "description": "Service state change",
+      "message_preview": "The  service entered the Driver load start state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 09:34:55",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 09:24:27",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 08:56:09",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  Claude Service File Name:  'C:\\Program Files\\WindowsApps\\Claude_1.1.9493.0_x64__pzs8sxrjxfjjc\\app\\resources\\cowork-svc.exe' Service Type:  user m"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 08:52:35",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 08:52:20",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 08:52:02",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 08:50:55",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_MysticLight Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Mystic_Light\\Lib\\\\NTIOLib_X64.sys Service Type:  kernel mode"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7045,
+      "channel": "System",
+      "time": "2026-03-30 08:50:54",
+      "provider": "Service Control Manager",
+      "description": "New service installed",
+      "message_preview": "A service was installed in the system.  Service Name:  NTIOLib_CC_COMM Service File Name:  C:\\Program Files (x86)\\MSI\\One Dragon Center\\Lib\\SYS\\NTIOLib_X64.sys Service Type:  kernel mode driver Servic"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 08:50:43",
+      "provider": "VfpExt",
+      "description": "Service state change",
+      "message_preview": "The  service entered the Filter detach complete state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 08:50:43",
+      "provider": "VfpExt",
+      "description": "Service state change",
+      "message_preview": "The  service entered the Filter detach start state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 08:50:43",
+      "provider": "VfpExt",
+      "description": "Service state change",
+      "message_preview": "The  service entered the Filter pause complete state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 7036,
+      "channel": "System",
+      "time": "2026-03-30 08:50:43",
+      "provider": "VfpExt",
+      "description": "Service state change",
+      "message_preview": "The  service entered the Filter pause start state."
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 4625,
+      "channel": "Application",
+      "time": "2026-03-30 21:33:55",
+      "provider": "Microsoft-Windows-EventSystem",
+      "description": "Failed logon attempt",
+      "message_preview": "The EventSystem sub system is suppressing duplicate event log entries for a duration of 86400 seconds.  The suppression timeout can be controlled by a REG_DWORD value named SuppressDuplicateDuration u"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 4625,
+      "channel": "Application",
+      "time": "2026-03-30 14:21:17",
+      "provider": "Microsoft-Windows-EventSystem",
+      "description": "Failed logon attempt",
+      "message_preview": "The EventSystem sub system is suppressing duplicate event log entries for a duration of 86400 seconds.  The suppression timeout can be controlled by a REG_DWORD value named SuppressDuplicateDuration u"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 4625,
+      "channel": "Application",
+      "time": "2026-03-30 08:50:43",
+      "provider": "Microsoft-Windows-EventSystem",
+      "description": "Failed logon attempt",
+      "message_preview": "The EventSystem sub system is suppressing duplicate event log entries for a duration of 86400 seconds.  The suppression timeout can be controlled by a REG_DWORD value named SuppressDuplicateDuration u"
+    },
+    {
+      "type": "Flagged Event ID",
+      "severity": "Medium",
+      "event_id": 4625,
+      "channel": "Application",
+      "time": "2026-03-30 00:21:53",
+      "provider": "Microsoft-Windows-EventSystem",
+      "description": "Failed logon attempt",
+      "message_preview": "The EventSystem sub system is suppressing duplicate event log entries for a duration of 86400 seconds.  The suppression timeout can be controlled by a REG_DWORD value named SuppressDuplicateDuration u"
+    },
+    {
+      "type": "Repeated Failures",
+      "severity": "High",
+      "event_id": null,
+      "channel": "System",
+      "time": null,
+      "provider": "Microsoft-Windows-TPM-WMI",
+      "description": "18 errors/criticals from 'Microsoft-Windows-TPM-WMI' in 'System'",
+      "message_preview": ""
+    }
+  ]
+}

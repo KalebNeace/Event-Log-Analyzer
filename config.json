@@ -1,0 +1,39 @@
+{
+  "log_channels": [
+    "System",
+    "Application",
+    "Security"
+  ],
+  "hours_back": 24,
+  "max_events_per_channel": 500,
+  "output_dir": "output",
+  "auto_open_report": true,
+  "anomaly_thresholds": {
+    "repeated_failures": 5,
+    "failed_logon_spike": 3
+  },
+  "provider_whitelist": [
+    "Microsoft-Windows-Security-SPP",
+    "Microsoft-Windows-HttpService",
+    "Microsoft-Windows-Kernel-Processor-Power",
+    "Microsoft-Windows-Kernel-General",
+    "Microsoft-Windows-Kernel-Boot",
+    "Microsoft-Windows-FilterManager",
+    "Microsoft-Windows-Diagnostics-Performance",
+    "Microsoft-Windows-WindowsUpdateClient",
+    "Microsoft-Windows-WLAN-AutoConfig",
+    "Microsoft-Windows-Defrag",
+    "Microsoft-Windows-TaskScheduler",
+    "Microsoft-Windows-Winlogon",
+    "Microsoft-Windows-DNS-Client",
+    "Microsoft-Windows-UserModePowerService"
+  ],
+  "correlation": {
+    "window_minutes": 15,
+    "thresholds": {
+      "rule_brute_force_success":  3,
+      "rule_lateral_movement":     3,
+      "rule_system_instability":   3
+    }
+  }
+}
